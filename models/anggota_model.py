@@ -4,7 +4,6 @@ class AnggotaModel:
         self.table_name = "anggota"
 
     def get_all_anggota(self):
-        """Metode Read: Mengambil semua data anggota"""
         if self.conn:
             cursor = self.conn.cursor(dictionary=True)
             query = f"SELECT * FROM {self.table_name}"
@@ -15,13 +14,46 @@ class AnggotaModel:
         return []
 
     def insert_anggota(self, nama, alamat):
-        """Metode Create: Menambahkan data anggota baru"""
         if self.conn:
-            cursor = self.conn.cursor()
-            query = f"INSERT INTO {self.table_name} (nama, alamat) VALUES (%s, %s)"
-            val = (nama, alamat)
-            cursor.execute(query, val)
-            self.conn.commit()
-            cursor.close()
-            return True
+            try:
+                cursor = self.conn.cursor()
+                query = f"INSERT INTO {self.table_name} (nama, alamat) VALUES (%s, %s)"
+                val = (nama, alamat)
+                cursor.execute(query, val)
+                self.conn.commit()
+                cursor.close()
+                return True
+            except Exception as e:
+                print("Error insert anggota:", e)
+                return False
+        return False
+
+    def update_anggota(self, id_anggota, nama, alamat):
+        if self.conn:
+            try:
+                cursor = self.conn.cursor()
+                query = f"UPDATE {self.table_name} SET nama = %s, alamat = %s WHERE id_anggota = %s"
+                val = (nama, alamat, id_anggota)
+                cursor.execute(query, val)
+                self.conn.commit()
+                cursor.close()
+                return True
+            except Exception as e:
+                print("Error update anggota:", e)
+                return False
+        return False
+
+    def delete_anggota(self, id_anggota):
+        if self.conn:
+            try:
+                cursor = self.conn.cursor()
+                query = f"DELETE FROM {self.table_name} WHERE id_anggota = %s"
+                val = (id_anggota,)
+                cursor.execute(query, val)
+                self.conn.commit()
+                cursor.close()
+                return True
+            except Exception as e:
+                print("Error delete anggota:", e)
+                return False
         return False

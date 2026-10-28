@@ -1,11 +1,38 @@
 import customtkinter as ctk
 from tkinter import ttk
 
+class BukuModel:
+    def __init__(self, conn):
+        self.conn = conn
+        self.table_name = "buku"  # Sesuaikan dengan nama tabel di database Anda
+
+    def update_buku(self, id_buku, judul, penulis, tahun_terbit):
+        if self.conn:
+            cursor = self.conn.cursor()
+            query = f"UPDATE {self.table_name} SET judul = %s, penulis = %s, tahun_terbit = %s WHERE id_buku = %s"
+            val = (judul, penulis, tahun_terbit, id_buku)
+            cursor.execute(query, val)
+            self.conn.commit()
+            cursor.close()
+            return True
+        return False
+
+    def delete_buku(self, id_buku):
+        if self.conn:
+            cursor = self.conn.cursor()
+            query = f"DELETE FROM {self.table_name} WHERE id_buku = %s"
+            val = (id_buku,)
+            cursor.execute(query, val)
+            self.conn.commit()
+            cursor.close()
+            return True
+        return False
+
 class BukuView(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Sistem Manajemen Perpustakaan")
-        self.geometry("800x450")
+        self.geometry("850x500")
         
         # Konfigurasi Grid Utama (1 Baris, 2 Kolom)
         self.grid_columnconfigure(0, weight=1) # Kolom Kiri (Form)
@@ -22,17 +49,25 @@ class BukuView(ctk.CTk):
         
         # Komponen Input
         self.entry_judul = ctk.CTkEntry(self.frame_kiri, placeholder_text="Masukkan Judul Buku")
-        self.entry_judul.pack(pady=10, padx=15, fill="x")
+        self.entry_judul.pack(pady=8, padx=15, fill="x")
         
         self.entry_penulis = ctk.CTkEntry(self.frame_kiri, placeholder_text="Masukkan Nama Penulis")
-        self.entry_penulis.pack(pady=10, padx=15, fill="x")
+        self.entry_penulis.pack(pady=8, padx=15, fill="x")
         
         self.entry_tahun = ctk.CTkEntry(self.frame_kiri, placeholder_text="Tahun Terbit (Misal: 2024)")
-        self.entry_tahun.pack(pady=10, padx=15, fill="x")
+        self.entry_tahun.pack(pady=8, padx=15, fill="x")
         
-        # Tombol Aksi
+        # Tombol Simpan
         self.btn_simpan = ctk.CTkButton(self.frame_kiri, text="Simpan Data", fg_color="green")
-        self.btn_simpan.pack(pady=20, padx=15, fill="x")
+        self.btn_simpan.pack(pady=10, padx=15, fill="x")
+        
+        # Tombol Perbarui (DISESUAIKAN MENJADI btn_perbarui agar sinkron dengan Controller)
+        self.btn_perbarui = ctk.CTkButton(self.frame_kiri, text="Update Data", fg_color="orange", text_color="black")
+        self.btn_perbarui.pack(pady=6, padx=15, fill="x")
+        
+        # Tombol Hapus (btn_hapus)
+        self.btn_hapus = ctk.CTkButton(self.frame_kiri, text="Hapus Data", fg_color="red")
+        self.btn_hapus.pack(pady=6, padx=15, fill="x")
         
         # ==========================================
         # FRAME KANAN: TABEL DAFTAR BUKU
@@ -60,7 +95,6 @@ class BukuView(ctk.CTk):
         
         self.tabel.pack(fill="both", expand=True, padx=15, pady=10)
 
-# Blok eksekusi untuk menguji tampilan grafis
 if __name__ == "__main__":
     app = BukuView()
     app.mainloop()
