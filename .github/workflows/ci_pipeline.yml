@@ -1,6 +1,5 @@
 name: Python CI Pipeline - Sistem Perpustakaan
 
-# Pipeline akan berjalan otomatis saat ada push atau pull request ke branch main
 on:
   push:
     branches: [ "main" ]
@@ -11,7 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    # Menyalakan layanan database MySQL secara otomatis di server GitHub Actions
     services:
       mysql:
         image: mysql:8.0
@@ -36,7 +34,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: 4. Membuat Tabel Users Otomatis di Database MySQL
+    - name: 4. Membuat Seluruh Tabel (users, anggota, buku) di MySQL
       run: |
         mysql -h 127.0.0.1 -u root perpustakaan -e "
         CREATE TABLE IF NOT EXISTS users (
@@ -45,6 +43,21 @@ jobs:
             password VARCHAR(255) NOT NULL,
             role ENUM('admin', 'anggota') NOT NULL DEFAULT 'anggota'
         );
+
+        CREATE TABLE IF NOT EXISTS anggota (
+            id_anggota INT PRIMARY KEY AUTO_INCREMENT,
+            nama VARCHAR(100) NOT NULL,
+            alamat TEXT,
+            telepon VARCHAR(20)
+        );
+
+        CREATE TABLE IF NOT EXISTS buku (
+            id_buku INT PRIMARY KEY AUTO_INCREMENT,
+            judul VARCHAR(150) NOT NULL,
+            penulis VARCHAR(100),
+            stok INT DEFAULT 0
+        );
+
         INSERT IGNORE INTO users (username, password, role) VALUES
         ('petugas', SHA2('admin123', 256), 'admin'),
         ('mahasiswa', SHA2('user123', 256), 'anggota');
