@@ -34,9 +34,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: 4. Import Schema Database ke MySQL
+    - name: 4. Buat Tabel Database Secara Langsung
       run: |
-        mysql -h 127.0.0.1 -u root perpustakaan < schema.sql
+        mysql -h 127.0.0.1 -u root perpustakaan -e "
+        CREATE TABLE IF NOT EXISTS users (
+            id_user INT PRIMARY KEY AUTO_INCREMENT,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            role ENUM('admin', 'anggota') NOT NULL DEFAULT 'anggota'
+        );
+        INSERT INTO users (username, password, role) VALUES
+        ('petugas', SHA2('admin123', 256), 'admin'),
+        ('mahasiswa', SHA2('user123', 256), 'anggota');
+        "
 
     - name: 5. Menjalankan Automated Unit Testing (Pytest)
       run: |
