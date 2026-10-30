@@ -1,6 +1,5 @@
 name: Python CI Pipeline - Sistem Perpustakaan
 
-# Pipeline akan berjalan otomatis saat ada push atau pull request ke branch main
 on:
   push:
     branches: [ "main" ]
@@ -11,13 +10,12 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    # Menambahkan layanan MySQL agar dapat diakses saat testing
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: db_perpus # Sesuaikan dengan nama database proyek Anda jika berbeda
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: db_perpus
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
