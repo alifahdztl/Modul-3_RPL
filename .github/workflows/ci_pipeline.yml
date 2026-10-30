@@ -34,7 +34,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: 4. Menjalankan Automated Unit Testing (Pytest)
+    - name: 4. Import Schema Database ke MySQL
+      run: |
+        mysql -h 127.0.0.1 -u root perpustakaan < schema.sql
+
+    - name: 5. Menjalankan Automated Unit Testing (Pytest)
       run: |
         python -m pytest -v
       env:
