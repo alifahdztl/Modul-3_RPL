@@ -11,6 +11,17 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    # Menambahkan layanan MySQL agar dapat diakses saat testing
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: db_perpus # Sesuaikan dengan nama database proyek Anda jika berbeda
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
     - name: 1. Mengambil Kode dari Repositori (Checkout)
       uses: actions/checkout@v4
