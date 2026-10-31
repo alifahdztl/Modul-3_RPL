@@ -5,7 +5,7 @@ class LoginView(ctk.CTk):
         super().__init__()
         self.controller = controller
         
-        self.title("Sistem dan Manajemen Perpustakaan - Login Sistem")
+        self.title("Sistem Manajemen Perpustakaan - Login Sistem")
         self.geometry("360x320")
         self.resizable(False, False)
 
