@@ -1,5 +1,4 @@
-import mysql.connector
-from mysql.connector import Error
+import pymysql
 
 class Database:
     def __init__(self):
@@ -11,14 +10,14 @@ class Database:
 
     def get_connection(self):
         try:
-            self.conn = mysql.connector.connect(
+            # Hubungkan tanpa cursorclass agar aman dari error versi pymysql
+            self.conn = pymysql.connect(
                 host=self.host,
-                database=self.db_name,
                 user=self.username,
-                password=self.password
+                password=self.password,
+                database=self.db_name
             )
-            if self.conn.is_connected():
-                return self.conn
-        except Error as e:
+            return self.conn
+        except Exception as e:
             print(f"Koneksi Gagal: {e}")
             return None

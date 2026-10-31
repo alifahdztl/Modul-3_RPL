@@ -1,59 +1,77 @@
+import pymysql
+from config.database import Database
+
 class AnggotaModel:
-    def __init__(self, connection):
-        self.conn = connection
+    def __init__(self):
+        self.db = Database()
         self.table_name = "anggota"
 
     def get_all_anggota(self):
-        if self.conn:
-            cursor = self.conn.cursor(dictionary=True)
-            query = f"SELECT * FROM {self.table_name}"
-            cursor.execute(query)
-            result = cursor.fetchall()
-            cursor.close()
-            return result
+        conn = self.db.get_connection()
+        if conn:
+            try:
+                cursor = conn.cursor()
+                cursor.execute(f"SELECT * FROM {self.table_name}")
+                result = cursor.fetchall()
+                cursor.close()
+                conn.close()
+                return result
+            except Exception as e:
+                print("Error get_all_anggota:", e)
+                if conn:
+                    conn.close()
         return []
 
-    def insert_anggota(self, nama, alamat):
-        if self.conn:
+    def tambah_anggota(self, nama, alamat, telepon):
+        conn = self.db.get_connection()
+        if conn:
             try:
-                cursor = self.conn.cursor()
-                query = f"INSERT INTO {self.table_name} (nama, alamat) VALUES (%s, %s)"
-                val = (nama, alamat)
-                cursor.execute(query, val)
-                self.conn.commit()
+                cursor = conn.cursor()
+                query = f"INSERT INTO {self.table_name} (nama, alamat, telepon) VALUES (%s, %s, %s)"
+                cursor.execute(query, (nama, alamat, telepon))
+                conn.commit()
                 cursor.close()
+                conn.close()
                 return True
             except Exception as e:
-                print("Error insert anggota:", e)
-                return False
+                print("Error tambah_anggota:", e)
+                if conn:
+                    conn.rollback()
+                    conn.close()
         return False
 
-    def update_anggota(self, id_anggota, nama, alamat):
-        if self.conn:
+    def ubah_anggota(self, id_anggota, nama, alamat, telepon):
+        conn = self.db.get_connection()
+        if conn:
             try:
-                cursor = self.conn.cursor()
-                query = f"UPDATE {self.table_name} SET nama = %s, alamat = %s WHERE id_anggota = %s"
-                val = (nama, alamat, id_anggota)
-                cursor.execute(query, val)
-                self.conn.commit()
+                cursor = conn.cursor()
+                query = f"UPDATE {self.table_name} SET nama=%s, alamat=%s, telepon=%s WHERE id_anggota=%s"
+                cursor.execute(query, (nama, alamat, telepon, id_anggota))
+                conn.commit()
                 cursor.close()
+                conn.close()
                 return True
             except Exception as e:
-                print("Error update anggota:", e)
-                return False
+                print("Error ubah_anggota:", e)
+                if conn:
+                    conn.rollback()
+                    conn.close()
         return False
 
-    def delete_anggota(self, id_anggota):
-        if self.conn:
+    def hapus_anggota(self, id_anggota):
+        conn = self.db.get_connection()
+        if conn:
             try:
-                cursor = self.conn.cursor()
-                query = f"DELETE FROM {self.table_name} WHERE id_anggota = %s"
-                val = (id_anggota,)
-                cursor.execute(query, val)
-                self.conn.commit()
+                cursor = conn.cursor()
+                query = f"DELETE FROM {self.table_name} WHERE id_anggota=%s"
+                cursor.execute(query, (id_anggota,))
+                conn.commit()
                 cursor.close()
+                conn.close()
                 return True
             except Exception as e:
-                print("Error delete anggota:", e)
-                return False
+                print("Error hapus_anggota:", e)
+                if conn:
+                    conn.rollback()
+                    conn.close()
         return False

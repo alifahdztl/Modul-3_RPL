@@ -1,9 +1,11 @@
 import customtkinter as ctk
 
 class LoginView(ctk.CTk):
-    def __init__(self):
+    def __init__(self, controller=None):
         super().__init__()
-        self.title("Login - Sistem Perpustakaan")
+        self.controller = controller
+        
+        self.title("Sistem dan Manajemen Perpustakaan - Login Sistem")
         self.geometry("360x320")
         self.resizable(False, False)
 
@@ -19,5 +21,18 @@ class LoginView(ctk.CTk):
         self.entry_password = ctk.CTkEntry(self.frame, placeholder_text="Password", show="*")
         self.entry_password.pack(pady=10, padx=20, fill="x")
 
-        self.btn_login = ctk.CTkButton(self.frame, text="Masuk", fg_color="blue")
+        # PERBAIKAN UTAMA: Menambahkan parameter command yang terhubung ke controller
+        self.btn_login = ctk.CTkButton(
+            self.frame, 
+            text="Masuk", 
+            fg_color="blue", 
+            command=self.trigger_login
+        )
         self.btn_login.pack(pady=20, padx=20, fill="x")
+
+    def trigger_login(self):
+        # Mengecek apakah controller terhubung, lalu memanggil fungsi login_action
+        if self.controller and hasattr(self.controller, 'login_action'):
+            self.controller.login_action()
+        else:
+            print("Controller belum terhubung ke LoginView!")

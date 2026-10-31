@@ -1,13 +1,13 @@
 import tkinter.messagebox as messagebox
 from tkinter import simpledialog
-import mysql.connector
+import pymysql
 from models.anggota_model import AnggotaModel
 from views.anggota_view import AnggotaView
 
 class AnggotaController:
     def __init__(self):
         # 1. Membuat koneksi database ke database 'perpustakaan'
-        self.db_connection = mysql.connector.connect(
+        self.db_connection = pymysql(
             host="localhost",
             user="root",
             password="",
