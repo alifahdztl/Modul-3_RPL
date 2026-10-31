@@ -10,16 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-          MYSQL_DATABASE: perpustakaan
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
     - name: 1. Mengambil Kode dari Repositori (Checkout)
       uses: actions/checkout@v4
@@ -27,44 +17,17 @@ jobs:
     - name: 2. Menyiapkan Lingkungan Python 3.11
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: '3.11'
 
     - name: 3. Menginstal Dependensi Proyek
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: 4. Membuat Seluruh Tabel (users, anggota, buku) di MySQL
+    - name: 4. Menjalankan Linter (Flake8)
       run: |
-        mysql -h 127.0.0.1 -u root perpustakaan -e "
-        CREATE TABLE IF NOT EXISTS users (
-            id_user INT PRIMARY KEY AUTO_INCREMENT,
-            username VARCHAR(50) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
-            role ENUM('admin', 'anggota') NOT NULL DEFAULT 'anggota'
-        );
-
-        CREATE TABLE IF NOT EXISTS anggota (
-            id_anggota INT PRIMARY KEY AUTO_INCREMENT,
-            nama VARCHAR(100) NOT NULL,
-            alamat TEXT,
-            telepon VARCHAR(20)
-        );
-
-        CREATE TABLE IF NOT EXISTS buku (
-            id_buku INT PRIMARY KEY AUTO_INCREMENT,
-            judul VARCHAR(150) NOT NULL,
-            penulis VARCHAR(100),
-            stok INT DEFAULT 0
-        );
-
-        INSERT IGNORE INTO users (username, password, role) VALUES
-        ('petugas', SHA2('admin123', 256), 'admin'),
-        ('mahasiswa', SHA2('user123', 256), 'anggota');
-        "
+        flake8 models/ controllers/ --count --select=E9,F63,F7,F82 --show-source --statistics
 
     - name: 5. Menjalankan Automated Unit Testing (Pytest)
       run: |
         python -m pytest -v
-      env:
-        PYTHONPATH: .
