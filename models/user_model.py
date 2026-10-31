@@ -20,7 +20,7 @@ class UserModel:
             try:
                 # Menggunakan DictCursor agar hasil fetch berupa dictionary
                 cursor = self.conn.cursor(pymysql.cursors.DictCursor)
-                query = "SELECT * FROM user WHERE username = %s AND password = %s"
+                query = "SELECT * FROM users WHERE username = %s AND password = %s"
                 cursor.execute(query, (username, self.hash_password(password)))
                 result = cursor.fetchone()
                 cursor.close()
