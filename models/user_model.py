@@ -5,27 +5,26 @@ from config.database import Database
 class UserModel:
     def __init__(self):
         self.db = Database()
-        self.table_name = "users"
+        self.conn = self.db.get_connection()
 
     @staticmethod
     def hash_password(password):
-        return hashlib.sha256(password.encode('utf-8')).hexdigest()
+        # Menggunakan SHA-256 untuk hashing password secara konsisten
+        return hashlib.sha256(password.encode()).hexdigest()
 
     def autentikasi(self, username, password):
-        conn = self.db.get_connection()
-        if conn:
+        if not self.conn:
+            self.conn = self.db.get_connection()
+        
+        if self.conn:
             try:
-                cursor = conn.cursor()
-                password_hash = self.hash_password(password)
-
-                query = f"SELECT id_user, username, role FROM {self.table_name} WHERE BINARY username = %s AND password = %s"
-                cursor.execute(query, (username, password_hash))
-                user = cursor.fetchone()
+                # Menggunakan DictCursor agar hasil fetch berupa dictionary
+                cursor = self.conn.cursor(pymysql.cursors.DictCursor)
+                query = "SELECT * FROM user WHERE username = %s AND password = %s"
+                cursor.execute(query, (username, self.hash_password(password)))
+                result = cursor.fetchone()
                 cursor.close()
-                conn.close()
-                return user
+                return result
             except Exception as e:
                 print("Error autentikasi:", e)
-                if conn:
-                    conn.close()
         return None
