@@ -10,7 +10,8 @@ class AnggotaModel:
         conn = self.db.get_connection()
         if conn:
             try:
-                cursor = conn.cursor()
+                # Menggunakan DictCursor agar hasil fetch berupa dictionary
+                cursor = conn.cursor(pymysql.cursors.DictCursor)
                 cursor.execute(f"SELECT * FROM {self.table_name}")
                 result = cursor.fetchall()
                 cursor.close()
@@ -22,13 +23,13 @@ class AnggotaModel:
                     conn.close()
         return []
 
-    def tambah_anggota(self, nama, alamat, telepon):
+    def tambah_anggota(self, nama, alamat):
         conn = self.db.get_connection()
         if conn:
             try:
                 cursor = conn.cursor()
-                query = f"INSERT INTO {self.table_name} (nama, alamat, telepon) VALUES (%s, %s, %s)"
-                cursor.execute(query, (nama, alamat, telepon))
+                query = f"INSERT INTO {self.table_name} (nama, alamat) VALUES (%s, %s)"
+                cursor.execute(query, (nama, alamat))
                 conn.commit()
                 cursor.close()
                 conn.close()
@@ -40,13 +41,13 @@ class AnggotaModel:
                     conn.close()
         return False
 
-    def ubah_anggota(self, id_anggota, nama, alamat, telepon):
+    def ubah_anggota(self, id_anggota, nama, alamat):
         conn = self.db.get_connection()
         if conn:
             try:
                 cursor = conn.cursor()
-                query = f"UPDATE {self.table_name} SET nama=%s, alamat=%s, telepon=%s WHERE id_anggota=%s"
-                cursor.execute(query, (nama, alamat, telepon, id_anggota))
+                query = f"UPDATE {self.table_name} SET nama=%s, alamat=%s WHERE id_anggota=%s"
+                cursor.execute(query, (nama, alamat, id_anggota))
                 conn.commit()
                 cursor.close()
                 conn.close()
